@@ -1,0 +1,101 @@
+<script>
+var renderChart = function(type, data, callback) {
+	chart = new Highcharts.Chart('container', {
+		chart: {
+			type: type,
+			marginRight: 10,
+			events: {
+				load: function() {
+					return callback(this)
+				}
+			}
+		},
+        tooltip: {
+          borderColor: '#000000',
+          formatter: function() {
+         	console.log(this)
+         	var doingPercentage = (100 - this.percentage).toFixed(1)
+         	var notDoing = this.percentage.toFixed(1)
+         	if (this.colorIndex === undefined) {
+         		y = '<br>Using app: ' + doingPercentage + '%'
+         		x = '<br>Not using app:' + notDoing + '%'
+         	} else {
+         	    y = '<br>Using app: ' + notDoing + '%'
+         		x = '<br>Not using app:' + doingPercentage + '%'
+         	}
+         	return '<b>' + this.series.name + 
+            '</b><br/>' + 
+            'Total no. of classes: ' + this.point.stackTotal + x + y
+         },
+        },
+		title: {
+			text: 'Center\'s Reminder Usage'
+		},
+		yAxis: {
+			title: {
+				text: 'Class count'
+			}
+		},
+		xAxis: {
+            categories: showHideChartCategories()
+		},
+		legend: {
+			enabled: false
+		},
+		credits: {
+			enabled: false
+		},
+        plotOptions: {
+    
+        column: {
+            stacking: 'normal'
+        },
+            series: {
+                pointPadding: 0.02, //White space left and right of columns
+                groupPadding: 0.02
+            }
+        },    
+		exporting: {
+			buttons: {
+				contextButton: {
+					text: '',
+					menuItems: [{
+						text: 'Line',
+						onclick: function() {
+							var type = 'line'
+							firstRenderChart(type)
+						}
+					}, {
+						text: 'Bar',
+						onclick: function() {
+							var type = 'bar'
+							firstRenderChart(type)
+						}
+					}, {
+						text: 'Column',
+						onclick: function() {
+							var type = 'column'
+							firstRenderChart(type)
+						}
+					}, {
+						text: 'Scatter',
+						onclick: function() {
+							var type = 'scatter'
+							firstRenderChart(type)
+						}
+					}]
+				}
+			}
+		},
+        optimize: {
+threshold: 100,
+autoExtremes: false,
+enableTooltip: true
+},
+		series: data,
+	});
+}
+
+</script>
+
+

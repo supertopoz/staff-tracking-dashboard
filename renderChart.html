@@ -1,0 +1,155 @@
+<script>
+//$(document).ready(function(){
+//  firstRenderChart('column')
+//})
+
+
+var catObj = {
+  "0": false,
+  "1": false,
+  "2": false,
+  "3": false,
+}
+
+function maintainSeriesVisibility(tempVisibility, series){
+  series.forEach(function(x, ind){
+  var position = ind.toString()
+  if (tempVisibility[position].ind === false){
+    chart.series[position].hide()
+  }
+  })
+}
+
+var getActivityCount = function(obj){
+  var total = 0
+  for (var level in obj){  
+    if(LEVELSTATUS[level] !== undefined && LEVELSTATUS[level] === true){
+    total +=  obj[level]; // adds up the score
+    }    
+  }
+  return total
+}
+
+
+var reBuildDataSet = function(data, callback){
+
+     var result = data.reduce(function(acc,item){
+     var oneCenterLevelCount = levelCount[item.name]
+     var totalClasses = oneCenterLevelCount['total'];
+     var totalClassCount = getActivityCount(totalClasses)
+     var didntOpenApp = oneCenterLevelCount['didntOpenApp']
+     var didntopenAppCount = getActivityCount(didntOpenApp)
+     var didntUseTemplate = oneCenterLevelCount['didntAddReminderTemplate']
+     var didntUseTemplateCount = getActivityCount(didntUseTemplate);
+     var didntAddStandardContent = oneCenterLevelCount['didntAddStandardContent']
+     var didntAddStandardContentCount = getActivityCount(didntAddStandardContent);
+     var total1 = totalClassCount - didntopenAppCount;
+     var total2 = totalClassCount - didntUseTemplateCount;
+     var total3 = totalClassCount - didntAddStandardContentCount;
+     
+     var obj = {};
+     obj.data = item.data
+     obj.data[1] = didntopenAppCount
+     obj.data[2] = didntUseTemplateCount
+     obj.data[3] = didntAddStandardContentCount
+     obj.name = item.name;
+     obj.color = 'lightgrey';
+     obj.stack =item.name     
+     obj.data.shift();
+     obj.tooltip = false;
+     acc.push(obj)
+       
+     obj2 = {};
+     obj2.data = [ total1, total2, total3];
+     obj2.name = item.name;
+     obj2.stack = item.name;
+     obj2._colorIndex = item._colorIndex;
+     obj2.notdone = true;
+     acc.push(obj2)
+     
+
+     return acc;
+   },[]);
+  console.log(result)
+  return callback(result)
+
+}
+
+var firstRenderChart = function(type, status, callback) {
+	setCategoriesToDisplay(function(cols) {
+		setDataToDisplay(cols, function(myData) {
+            var data = myData
+			reBuildDataSet(data, function(myData) {
+				renderChart(type, myData, function(data) {
+					var series = data.series
+					if (status === undefined) {
+						$('.legend').empty();
+						legendRender(series)
+					}
+				})
+			})
+		})
+	})
+	if (callback !== undefined) {
+		return callback('done')
+	}
+}
+
+
+
+var showHideChartCategories = function(){
+
+  var categories = [];
+  var options = [
+            'Classes using Reminder app', 
+            'Classes using the template', 
+            'Classes using the standard content']  
+  for (var i in catObj){
+   if (catObj[i] === false){
+    categories.push(options[Number(i)])
+    }
+  }
+  return categories
+}
+
+var recalculateLevels = function(){
+  // loop through all of the data. 
+  // for each center get the data array - change the count based on the level switiches. 
+}
+
+var setCategoriesToDisplay = function(callback){
+  var cols = []
+   for (var i in catObj){
+    if (catObj[i] === false){
+      cols.push(Number(i))
+    }
+  }
+  return callback(cols)
+}
+
+var setDataToDisplay = function(cols,callback){
+  
+  var myData = JSON.parse(JSON.stringify(incomingData));
+//  console.log('myData');
+//  console.log(typeof myData)
+  
+  var newArr = [];
+  myData.forEach(function(x){
+    x.data.forEach(function(y, secInd){
+      if(cols.indexOf(secInd) >= 0 ){
+        newArr.push(y);
+      }
+    })
+  x.data = newArr;
+   newArr = []; 
+  })
+
+//   data = myData 
+   return callback(myData)
+}
+
+
+
+</script>
+
+

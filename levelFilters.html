@@ -1,0 +1,25 @@
+<script>
+var buildLevelFilter = function(center,color){
+//  var jumpstart = ['L3','L4','L5','L6','L7','L8','L9','L10','L11']
+  
+  for (var i in programmeLevels){ 
+    programmeLevels[i].levels.forEach(function(level){
+      $('#'+i).append(
+      '<div class="col s12 m12 l12 x12">'+
+      '<div class="switch">'+
+      '<label style="color:'+ programmeLevels[i].color +'" class="'+ i +'"  id="'+level+'">'+level+
+      '<input type="checkbox" value="'+level+'" checked>'+
+      '<span class="lever mini level"></span>'+
+      '</label>'+
+      '</div>'+
+      '</div>'
+      )
+     }) 
+  }  
+}
+ $(document).ready(function(){
+  buildLevelFilter();
+ })
+</script>
+
+

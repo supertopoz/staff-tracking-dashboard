@@ -1,0 +1,100 @@
+<script>
+var LEVELSTATUS = {};
+$("#jumpstart-all").on('click', function() {
+	if ($("#jumpstart-all").is(':checked')) {
+		$(".jumpstart-levels > input[type=checkbox]").each(function() {
+            center = $(this).closest('label').text();
+            showCenter(center)
+			$(this).prop("checked", true);
+		});
+	} else {
+		$(".jumpstart-levels > input[type=checkbox]").each(function() {
+            center = $(this).closest('label').text();
+            hideCenter(center)
+			$(this).prop("checked", false);
+		});
+	}
+});
+
+$("#superjuniors-all").on('click', function() {
+	if ($("#superjuniors-all").is(':checked')) {
+		$(".superjunior-levels > input[type=checkbox]").each(function() {
+            center = $(this).closest('label').text();
+            showCenter(center)
+			$(this).prop("checked", true);
+		});
+	} else {
+		$(".superjunior-levels > input[type=checkbox]").each(function() {
+            center = $(this).closest('label').text();
+            hideCenter(center)
+			$(this).prop("checked", false);
+		});
+	}
+});
+
+$("#smartteens-all").on('click', function() {
+	if ($("#smartteens-all").is(':checked')) {
+		$(".smartteen-levels > input[type=checkbox]").each(function() {
+            center = $(this).closest('label').text();
+            showCenter(center)
+			$(this).prop("checked", true);
+		});
+	} else {
+		$(".smartteen-levels > input[type=checkbox]").each(function() {
+            center = $(this).closest('label').text();
+            hideCenter(center)
+			$(this).prop("checked", false);
+		});
+	}
+});
+
+function getAllStatuses(level, status){
+ var levels = {};
+ var programmes = ['jumpstart-levels','smartteen-levels','superjunior-levels']
+   programmes.forEach(function(x){
+     $("."+x+" > input[type=checkbox]").each(function() {
+       var myLevel = $(this).closest('label').text();          
+          levels[myLevel] = $(this).prop("checked")	                  
+     if ((level === 'Jumpstart' && myLevel.indexOf('L') >=0) && status === true){
+          levels[myLevel] = true;
+     } else if((level === 'Jumpstart' && myLevel.indexOf('L') >=0) && status === false){
+        levels[myLevel] = false;
+     }    
+          if ((level === 'Super Juniors' && myLevel.indexOf('J') >=0) && status === true){
+          levels[myLevel] = true;
+     } else if((level === 'Super Juniors' && myLevel.indexOf('J') >=0) && status === false){
+        levels[myLevel] = false;
+     }
+          if ((level === 'Smart Teens' && myLevel.indexOf('S') >=0) && status === true){
+          levels[myLevel] = true;
+     } else if((level === 'Smart Teens' && myLevel.indexOf('S') >=0) && status === false){
+        levels[myLevel] = false;
+     }       
+		}); 
+ })
+ levels[level] = status
+ LEVELSTATUS = levels; 
+ firstRenderChart('column')
+}
+
+
+
+$(document).on('click', '.level', function() {
+
+	var $button = $(this).parent().find('input')[0]
+	var status = $button.checked;
+	var button = $(this).parent().text().trim()
+	if (!status) {
+        getAllStatuses(button,true)
+		$($button).attr('checked', false)
+        
+	} else {
+        getAllStatuses(button, false)
+		$($button).attr('checked', true)        
+	}
+})
+
+
+</script>
+
+

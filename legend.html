@@ -1,0 +1,29 @@
+<script>
+var buildLegend = function(center,color){
+
+  var location = centersList[center].location
+  $('.legend').append(
+    '<div class="col s12 m12 l12 x12">'+
+    '<div class="switch">'+
+      '<label style="color:'+color+'" class="center-label centers"  id="'+center+'">'+center+
+        '<input type="checkbox" value="'+location+'" checked>'+
+        '<span class="lever mini center-lever"></span>'+
+     '</label>'+
+    '</div>'+
+   '</div>'
+  )
+}
+
+var legendRender = function(series){
+ var names = {}; 
+  for (var i = 0; i < series.length; i++){
+  if(names[series[i].name] === 1){
+    
+    buildLegend(series[i].name,series[i].color)
+    } else {
+      names[series[i].name] = 1;
+    }
+  }
+}
+</script>
+

@@ -1,0 +1,86 @@
+<script>
+
+$(document).ready(function(){
+  var today = moment().format("YYYY-MM-DD");
+  var yesterday = moment().add(-1, 'days').format("YYYY-MM-DD");
+  $('#from2').val(yesterday)
+  $('#until2').val(today)
+  $('#date-range').val('1')
+  $('#days-ago').text('1')
+  
+})
+
+var getDaysBetweenDates = function(sDate, eDate) {
+     var days = []; 
+     while (sDate.isBefore(eDate) || sDate.isSame(eDate)) {
+       var x = sDate.format('ddd')
+         if (days.indexOf(x)<0) days.push(x);                          
+         sDate.add(1,'days');
+     }
+    return days;
+};
+
+// pick up dates from UI
+var chartFilterDates2 = function(){
+  var x = "";
+  var y = "";
+  if($('#from2').val() === '') x = '2016-01-01';
+    else x = moment($("#from2").val()).format("YYYY-MM-DD");
+  if($('#until2').val() === '') y = moment().format("YYYY-MM-DD");  
+    else y = moment($("#until2").val()).format("YYYY-MM-DD");
+  return [x,y];
+}
+
+$('.datepicker2').pickadate({
+  selectMonths: true, // Creates a dropdown to control month
+  selectYears: true // Creates a dropdown of 15 years to control year
+});
+
+// init data after selecting dates 
+$('.datepicker2').on('change', function(){  
+  getAllStatuses()
+  $('#days-ago').text('');
+  $('#days').css('color', 'lightgrey');
+  $('#date-range').val(0)
+  var untilPicker = $(this).attr('id')
+    if(untilPicker === 'from2') {
+    
+      $('#until2').val('')
+    }
+  if(untilPicker === "until2" && $('#dropdown2').val() !== null ) {  
+  var fromUntil = chartFilterDates2();
+  var days = getDaysBetweenDates(moment(fromUntil[0]),moment(fromUntil[1]))  
+  var datesAndDays = [fromUntil[0],fromUntil[1],days]  
+  status = true
+  $('#loading-tools').show()
+  google.script.run.withFailureHandler(failed).withSuccessHandler(success).getAllClassesAndProcess(datesAndDays);
+  }
+  $(this).next().find('.picker__close').click();
+});
+
+
+$(document).on('change','#date-range',function(){
+  getAllStatuses()
+  var days = $(this).val();
+  $('#days-ago').text(days);
+  $('#days').css('color', 'black');
+  // set the to date to today. 
+  var now = moment().format('YYYY-MM-DD');
+  $('#until2').val(now);
+  var beforeNow = moment().subtract(days, 'days').format('YYYY-MM-DD');
+  
+  $('#from2').val(beforeNow);
+  if($('#dropdown2').val() !== null ) {
+     var fromUntil = chartFilterDates2();
+  var days = getDaysBetweenDates(moment(fromUntil[0]),moment(fromUntil[1]))  
+  var datesAndDays = [fromUntil[0],fromUntil[1],days]  
+  status = true
+  $('#loading-tools').show()
+  google.script.run.withFailureHandler(failed).withSuccessHandler(success).getAllClassesAndProcess(datesAndDays);
+  
+  } 
+})
+
+</script>
+
+

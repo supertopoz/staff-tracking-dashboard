@@ -1,0 +1,27 @@
+<script>
+
+var seriesVisbility = {};
+var storeSeries = function (callback){
+   chart.series.forEach(function(x, ind){
+      seriesVisbility[ind] = {ind: x.visible, name:x.name}
+    })
+   return callback('done')
+}
+
+$(document).on('click', '.cat', function() {
+ //   getAllStatuses();
+    seriesVisbility = {};
+    var $button = $(this).parent().find('input')[0]
+    var $value = $(this).parent().find('input').val()
+    var $status = $button.checked;
+    var num = $value.replace('cat', '');
+    catObj[num]  = $status
+    storeSeries(function(callback){
+      firstRenderChart('column', false, function(callback){
+        var tempVisibility =  seriesVisbility;
+        var series = chart.series;
+         maintainSeriesVisibility(tempVisibility, series)
+      })
+   })
+})
+</script>

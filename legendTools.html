@@ -1,0 +1,137 @@
+<script>
+var showCenter = function(center) {
+	var dataSeries = chart.series;    
+	dataSeries.forEach(function(x) {
+		if (x.name === center) {
+            x.visible = false
+			x.setVisible(true, false);
+		}
+	})
+    setTimeout(function(){
+     chart.redraw()
+    },50)
+   
+}
+var hideCenter = function(center) {
+	var dataSeries = chart.series;
+	dataSeries.forEach(function(x) {
+		if (x.name === center) {
+            x.visible = true
+			x.setVisible(false, false);
+		}
+	})
+        setTimeout(function(){
+     chart.redraw()
+    },50)
+}
+var showAllCenters = function() {
+	var dataSeries = chart.series;
+	dataSeries.forEach(function(x) {
+        x.visible = false
+        
+		x.setVisible(true, false);
+        chart.redraw(false)
+	})
+}
+var hideAllCenters = function() {
+	var dataSeries = chart.series    
+	dataSeries.forEach(function(x) {
+        x.visible = true
+		x.setVisible(false, false);
+	})
+}
+
+$("#all").on('click', function() {
+        getAllStatuses()
+        $('#loading-tools').show()
+	if ($("#all").is(':checked')) {
+        $('#north').prop('checked', true)
+        $('#south').prop('checked', true)
+		$(".centers > input[type=checkbox]").each(function() {
+            center = $(this).closest('label').text();
+			$(this).prop("checked", true);
+		});
+        showAllCenters()
+	} else {
+        $('#north').prop('checked', false)
+        $('#south').prop('checked', false)
+		$(".centers > input[type=checkbox]").each(function() {
+            center = $(this).closest('label').text();
+			$(this).prop("checked", false);
+		});
+        hideAllCenters()
+	}
+    $('#loading-tools').hide()
+});
+
+$("#south").on('click', function() {
+        getAllStatuses()
+        var center = '';
+	if ($("#south").is(':checked')) {
+		$(".centers > input[type=checkbox]").each(function() {
+        if($(this).val() === "South"){
+            center = $(this).closest('label').text();
+            showCenter(center)
+			$(this).prop("checked", true);
+        }
+		});
+	} else {
+		$(".centers > input[type=checkbox]").each(function() {
+        if($(this).val() === "South") {
+            center = $(this).closest('label').text();
+            hideCenter(center)
+			$(this).prop("checked", false);
+        }
+		});        
+	}
+});
+
+$("#north").on('click', function() {
+       getAllStatuses()
+       var center = '';
+	if ($("#north").is(':checked')) {
+		$(".centers > input[type=checkbox]").each(function() {
+        if($(this).val() === "North"){
+            center = $(this).closest('label').text();
+            showCenter(center)
+			$(this).prop("checked", true);
+        }
+		});
+	} else {
+
+		$(".centers > input[type=checkbox]").each(function() {
+        if($(this).val() === "North") {
+            center = $(this).closest('label').text();
+            hideCenter(center)
+			$(this).prop("checked", false);
+        }
+		});        
+	}
+});
+
+$(document).on('click', '.center-lever', function() {
+    console.log('working')
+ //   getAllStatuses()
+	var $button = $(this).parent().find('input')[0]
+	var status = $button.checked;
+	var button = $(this).parent().text().trim()
+    console.log(button)
+	if ((button === 'All' || button === 'Only Southern') && !status) {
+        console.log('hit show all')
+		showAllCenter()
+	}
+	if (button === 'All' && status) {
+        console.log('hit hide all')
+		hideAllCenter()
+	}
+	if (!status) {
+		showCenter(button);
+		$($button).attr('checked', false)
+	} else {
+		hideCenter(button)
+		$($button).attr('checked', true)
+	}
+})
+</script>
+
+

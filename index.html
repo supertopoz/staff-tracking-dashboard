@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+  <script src="https://cdn.jsdelivr.net/momentjs/2.14.1/moment-with-locales.min.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/10.1.0/nouislider.min.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/10.1.0/nouislider.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wnumb/1.1.0/wNumb.min.js"></script>
+  <title>All centers</title>
+</head>
+<body>
+<script>
+$(document).ready(function(){
+  var today = moment().format('ddd')
+  var yesterday = moment().add('days', -1).format('ddd')
+  var days = [yesterday,today];
+  var untilDate = moment().format('YYYY-MM-DD');
+  var fromDate =  moment().add('days', -1).format('YYYY-MM-DD') 
+  var datesAndDays = [fromDate,untilDate,[yesterday,today]]
+  google.script.run.withFailureHandler(failed).withSuccessHandler(success).getAllClassesAndProcess(datesAndDays);
+})
+
+function failed(e){ console.log(e)}
+
+function success(e){
+  $('#loading-tools').hide();
+  $('#app').show();  
+  incomingData = e[0];
+  levelCount = e[1];
+  getAllStatuses()
+  firstRenderChart('column')  
+}
+
+</script>
+  <div id="loading-tools">
+    <div class="progress">
+      <div class="indeterminate"></div>
+    </div>
+    <div>
+      Loading...
+    </div>
+  </div>
+  <div hidden="" id="app">
+    <div class="row">
+      <div class="col s9 m9 l9">
+        <div class="row card">
+          <div class="col s12 m12 l12 x12">
+            <div id="container"><img id="spinner" src="/assets/chart_loader.gif"></div>
+            <div></div>
+          </div>
+        </div>
+        <div class="row card">
+          <div class="row">
+            <div class="col s12 m12 l12 x12">
+              <p class="mini-title">Date Filter</p>
+            </div>
+          </div>
+          <div class="col s12 m6 l4">
+            <p class="q-view">Past <span id="days-ago">0</span> day(s)</p>
+            <p class="range-field"><input id="date-range" max="7" min="0" type="range" value="0"></p>
+          </div>
+          <div class="col s12 m6 l4">
+            <input class="datepicker2" id="from2" placeholder="From" type="date">
+          </div>
+          <div class="col s12 m6 l4">
+            <input class="datepicker2" id="until2" placeholder="To" type="date">
+          </div>
+        </div>
+      </div>
+      <div class="col s3 m3 l3 x3">
+        <div id="dashboard">
+          <div class="row card">
+            <div class="row">
+              <div class="col s12 m12 l12 x12">
+                <p class="mini-title">Programme and Level Filter</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="">
+                <ul class="collapsible" data-collapsible="accordion">
+                  <li>
+                    <div class="collapsible-header">
+                      <i class="material-icons expand">zoom_out_map</i>
+                      <div class="switch">
+                        <label>Jumpstart<input checked id="jumpstart-all" type="checkbox"> <span class="lever level"></span></label>
+                      </div>
+                    </div>
+                    <div class="collapsible-body">
+                      <div class="row">
+                        <div class="col s12 m12 l12">
+                          <div id="jumpstart-levels"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="collapsible-header">
+                      <i class="material-icons expand">zoom_out_map</i>
+                      <div class="switch">
+                        <label>Super Juniors<input checked id="superjuniors-all" type="checkbox"> <span class="lever level"></span></label>
+                      </div>
+                    </div>
+                    <div class="collapsible-body">
+                      <div class="row">
+                        <div class="col s12 m12 l12">
+                          <div id="superjunior-levels"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="collapsible-header">
+                      <i class="material-icons expand">zoom_out_map</i>
+                      <div class="switch">
+                        <label>Smart Teens<input checked id="smartteens-all" type="checkbox"> <span class="lever level"></span></label>
+                      </div>
+                    </div>
+                    <div class="collapsible-body">
+                      <div class="row">
+                        <div class="col s12 m12 l12">
+                          <div id="smartteen-levels"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="row center-switches card">
+            <div class="row">
+              <div class="col s12 m12 l12 x12">
+                <p class="mini-title">Center Filter</p>
+              </div>
+            </div>
+            <div class="col s12 m4 l4">
+              <div class="switch">
+                <label>All<input checked id="all" type="checkbox"> <span class="lever"></span></label>
+              </div>
+            </div>
+            <div class="col s12 m4 l4">
+              <div class="switch">
+                <label>South<input checked id="south" type="checkbox"> <span class="lever"></span></label>
+              </div>
+            </div>
+            <div class="col s12 m4 l4">
+              <div class="switch">
+                <label>North<input checked id="north" type="checkbox"> <span class="lever"></span></label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12 m12 l12 x12">
+                <p class="mini-title"></p>
+              </div>
+            </div>
+            <div class="col s12 m12 l12">
+              <div class="row legend"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>  
+  </body>
+  <?!= include('stylesheet'); ?>
+  <?!= include('data'); ?>
+  <?!= include('chart'); ?>
+  <?!= include('renderChart'); ?>
+  <?!= include('legend'); ?>
+  <?!= include('legendTools'); ?>
+  <?!= include('programmeSliders'); ?>
+  <?!= include('datePickers'); ?>
+  <?!= include('categorySwitches'); ?>
+  <?!= include('centers'); ?>
+  <?!= include('levelFilters'); ?>
+  <?!= include('levelFilterTools'); ?>
+</html>
+
+
